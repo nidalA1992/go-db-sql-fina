@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"math/rand"
 	"testing"
 	"time"
@@ -50,16 +51,18 @@ func TestAddGetDelete(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, parc.CreatedAt, parcel.CreatedAt)
-	assert.Equal(t, parc.Status, parc.Status)
-	assert.Equal(t, parc.Address, parc.Address)
+	assert.Equal(t, parc.Status, parcel.Status)
+	assert.Equal(t, parc.Address, parcel.Address)
 	assert.Equal(t, parc.Number, parcel.Number)
 	assert.Equal(t, parc.Client, parcel.Client)
 
 	// delete
-	err = store.Delete(parcel.Number)
+	err = store.Delete(parc.Number)
 	require.NoError(t, err)
 
 	parc, err = store.Get(parcel.Number)
+	require.Error(t, err)
+	assert.True(t, errors.Is(err, sql.ErrNoRows))
 
 	assert.Empty(t, parc.Client)
 	assert.Empty(t, parc.Address)
