@@ -162,9 +162,5 @@ func TestGetByClient(t *testing.T) {
 		assert.True(t, ok)
 
 		assert.Equal(t, parcel, p)
-		assert.Equal(t, parcel.Number, p.Number)
-		assert.Equal(t, parcel.Status, p.Status)
-		assert.Equal(t, parcel.Address, p.Address)
-		assert.Equal(t, parcel.CreatedAt, p.CreatedAt)
 	}
 }
