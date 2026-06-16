@@ -103,7 +103,7 @@ func main() {
 		fmt.Println("open db failed: %w", err)
 		return
 	}
-
+	defer db.Close()
 	fmt.Println("start")
 
 	store := NewParcelStore(db)
