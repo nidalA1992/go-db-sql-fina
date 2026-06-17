@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"errors"
 	"math/rand"
 	"testing"
 	"time"
@@ -42,7 +41,7 @@ func TestAddGetDelete(t *testing.T) {
 	// add
 	id, err := store.Add(parcel)
 	require.NoError(t, err)
-	assert.NotEmpty(t, id)
+	require.NotEmpty(t, id)
 
 	parcel.Number = id
 
@@ -60,7 +59,7 @@ func TestAddGetDelete(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = store.Get(parcel.Number)
-	require.True(t, errors.Is(err, sql.ErrNoRows))
+	require.ErrorIs(t, err, sql.ErrNoRows)
 }
 
 // TestSetAddress проверяет обновление адреса
@@ -68,6 +67,7 @@ func TestSetAddress(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
 	require.NoError(t, err)
+	defer db.Close()
 
 	parcel := getTestParcel()
 	store := NewParcelStore(db)
@@ -95,6 +95,7 @@ func TestSetStatus(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
 	require.NoError(t, err)
+	defer db.Close()
 
 	parcel := getTestParcel()
 	store := NewParcelStore(db)
@@ -123,6 +124,7 @@ func TestGetByClient(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
 	require.NoError(t, err)
+	defer db.Close()
 
 	store := NewParcelStore(db)
 

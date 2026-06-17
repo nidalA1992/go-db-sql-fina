@@ -20,6 +20,7 @@ func (s ParcelStore) Add(p Parcel) (int, error) {
 		sql.Named("status", p.Status),
 		sql.Named("address", p.Address),
 		sql.Named("created_at", p.CreatedAt))
+
 	if err != nil {
 		return 0, fmt.Errorf("error add parcel: %w", err)
 	}
@@ -37,9 +38,14 @@ func (s ParcelStore) Get(number int) (Parcel, error) {
 		sql.Named("number", number))
 
 	p := Parcel{}
+
 	err := row.Scan(&p.Number, &p.Client, &p.Status, &p.Address, &p.CreatedAt)
 	if err != nil {
 		return Parcel{}, fmt.Errorf("error scan row: %w", err)
+	}
+
+	if row.Err() != nil {
+		return Parcel{}, fmt.Errorf("error row error: %w", row.Err())
 	}
 
 	return p, nil
@@ -52,7 +58,10 @@ func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error get by client parcel: %w", err)
 	}
-	defer s.db.Close()
+
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("error row error: %w", rows.Err())
+	}
 
 	// заполните срез Parcel данными из таблицы
 	var res []Parcel
@@ -66,6 +75,10 @@ func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 		}
 
 		res = append(res, p)
+	}
+
+	if err = rows.Close(); err != nil {
+		return nil, fmt.Errorf("error close rows: %w", err)
 	}
 
 	return res, nil
